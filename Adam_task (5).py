@@ -7,9 +7,9 @@
 # In[7]:
 
 
-from keras.datasets import fashion_mnist
-from keras.layers import Conv2D, Flatten, Dense, AvgPool2D
-from keras.models import Sequential
+from tensorflow.keras.datasets import fashion_mnist
+from tensorflow.keras.layers import Conv2D, Flatten, Dense, AvgPool2D
+from tensorflow.keras.models import Sequential
 import numpy as np
 from tensorflow.keras.optimizers import Adam
 
