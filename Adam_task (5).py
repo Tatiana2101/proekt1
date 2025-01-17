@@ -65,7 +65,7 @@ def train_model(model, train_data, test_data, batch_size=None, epochs=10,
 
 # Основной код для выполнения
 if __name__ == "__main__":
-   # path = "path_to_your_fruit_dataset"  # Замените на путь к вашему набору данных
+  #  path = "path_to_your_fruit_dataset"  # Замените на путь к вашему набору данных
     train_data, test_data = load_train(path)
     
     model = create_model()  # Вы можете передать другой input_shape, если нужно
@@ -76,3 +76,4 @@ if __name__ == "__main__":
     # Проверка точности на тестовой выборке
     test_loss, test_acc = model.evaluate(test_data)
     print(f'Test accuracy: {test_acc * 100:.2f}%')
+
