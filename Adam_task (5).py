@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential
 import numpy as np
 from tensorflow.keras.optimizers import Adam
 
-def load_train():
+def load_train(path=None):
     # Загружаем данные Fashion MNIST
     (features_train, target_train), (features_test, target_test) = fashion_mnist.load_data()
     
