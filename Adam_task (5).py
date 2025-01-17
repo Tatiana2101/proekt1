@@ -1,3 +1,7 @@
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
+
 def load_train(path):
     datagen = ImageDataGenerator(
         horizontal_flip=True,
@@ -6,7 +10,7 @@ def load_train(path):
 
     train_datagen_flow = datagen.flow_from_directory(
         path,
-        target_size=(150, 150, 3),
+        target_size=(150, 150),
         batch_size=16,
         class_mode='sparse',
         seed=12345)
