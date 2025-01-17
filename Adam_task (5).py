@@ -46,7 +46,8 @@ def train_model(model, train_data, test_data, batch_size=32, epochs=10):
               verbose=2,
               shuffle=True)
 
-# Основной код
-train_data, test_data = load_train()
-model = create_model(input_shape=(28, 28, 1))
-train_model(model, train_data, test_data)
+if __name__ == "__main__":
+    # Основной код
+    train_data, test_data = load_train()
+    model = create_model(input_shape=(28, 28, 1))
+    train_model(model, train_data, test_data)
