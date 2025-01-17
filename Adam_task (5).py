@@ -28,8 +28,8 @@ def load_train(path):
     return train_datagen_flow, test_datagen_flow
 
 # Функция создания модели
-def create_model():
-    base_model = VGG16(weights='imagenet', include_top=False, input_shape=(150, 150, 3))
+def create_model(input_shape=(150, 150, 3)):
+    base_model = VGG16(weights='imagenet', include_top=False, input_shape=input_shape)
     base_model.trainable = False  # Замораживаем слои базовой модели
 
     model = models.Sequential([
@@ -65,10 +65,10 @@ def train_model(model, train_data, test_data, batch_size=None, epochs=10,
 
 # Основной код для выполнения
 if __name__ == "__main__":
-    path = "path_to_your_fruit_dataset"  # Замените на путь к вашему набору данных
+   # path = "path_to_your_fruit_dataset"  # Замените на путь к вашему набору данных
     train_data, test_data = load_train(path)
     
-    model = create_model()
+    model = create_model()  # Вы можете передать другой input_shape, если нужно
     
     # Обучаем модель
     model = train_model(model, train_data, test_data, epochs=20)  # Увеличьте количество эпох при необходимости
