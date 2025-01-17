@@ -1,31 +1,76 @@
-def  load_train(path):
-        datagen = ImageDataGenerator(
+def load_train():
+    # Параметры для загрузки данных
+    train_datagen = ImageDataGenerator(
+        rescale=1.0/255,
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
         horizontal_flip=True,
-        vertical_flip=True,
-        rescale=1/255.)
+        fill_mode='nearest'
+    )
 
-        train_datagen_flow = datagen.flow_from_directory(
-        path,
+    test_datagen = ImageDataGenerator(rescale=1.0/255)
+
+    train_generator = train_datagen.flow_from_directory(
+        train_data_dir,
         target_size=(150, 150),
-        batch_size=16,
-        class_mode='sparse',
-        seed=12345)
+        batch_size=32,
+        class_mode='categorical'
+    )
 
-        return train_datagen_flow
+    validation_generator = test_datagen.flow_from_directory(
+        test_data_dir,
+        target_size=(150, 150),
+        batch_size=32,
+        class_mode='categorical'
+    )
 
-def train_model(model, train_data, test_data, batch_size=None, epochs=10,
-                steps_per_epoch=None, validation_steps=None):
+    return train_generator, validation_generator
 
-    if steps_per_epoch is None:
-        steps_per_epoch = len(train_data)
-    if validation_steps is None:
-        validation_steps = len(test_data)
+def create_model():
+    model = models.Sequential()
+    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(150, 150, 3)))
+    model.add(layers.MaxPooling2D((2, 2)))
+    
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    
+    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
 
-    model.fit(train_data,
-              validation_data=test_data,
-              batch_size=batch_size, epochs=epochs,
-              steps_per_epoch=steps_per_epoch,
-              validation_steps=validation_steps,
-              verbose=2)
+    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+
+    model.add(layers.Flatten())
+    model.add(layers.Dense(512, activation='relu'))
+    model.add(layers.Dense(5, activation='softmax'))  # Измените количество классов на ваше значение
+
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
 
     return model
+
+def train_model(model, train_generator, validation_generator):
+    history = model.fit(
+        train_generator,
+        steps_per_epoch=train_generator.samples // train_generator.batch_size,
+        validation_data=validation_generator,
+        validation_steps=validation_generator.samples // validation_generator.batch_size,
+        epochs=30  # Убедитесь, что количество эпох позволяет закончить обучение за час
+    )
+    
+    return history
+
+# Основной блок выполнения
+if __name__ == "__main__":
+    train_generator, validation_generator = load_train()
+    model = create_model()
+    history = train_model(model, train_generator, validation_generator)
+
+    # Оценка модели на тестовых данных
+    test_loss, test_acc = model.evaluate(validation_generator)
+    print(f'Test accuracy: {test_acc:.2f}')
+
