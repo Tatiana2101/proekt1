@@ -40,4 +40,21 @@ def train_model(model, train_data, epochs=10):
         steps_per_epoch=train_data.samples // train_data.batch_size
     )
     return history
+def train_model(model, train_data, test_data, batch_size=None, epochs=10,
+                steps_per_epoch=None, validation_steps=None):
+
+    if steps_per_epoch is None:
+        steps_per_epoch = len(train_data)
+    if validation_steps is None:
+        validation_steps = len(test_data)
+
+    model.fit(train_data,
+              validation_data=test_data,
+              batch_size=batch_size, epochs=epochs,
+              steps_per_epoch=steps_per_epoch,
+              validation_steps=validation_steps,
+              verbose=2)
+
+    return model
+
 
