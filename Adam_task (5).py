@@ -1,3 +1,5 @@
+from tensorflow.keras.applications.resnet import ResNet50
+
 def  load_train(path):
         datagen = ImageDataGenerator(
         horizontal_flip=True,
