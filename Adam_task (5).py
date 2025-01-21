@@ -46,7 +46,7 @@ def train_model(model, train_data, epochs=9):
         steps_per_epoch=train_data.samples // train_data.batch_size
     )
     return history
-def train_model(model, train_data, test_data, batch_size=None, epochs=10,
+def train_model(model, train_data, test_data, batch_size=None, epochs=9,
                 steps_per_epoch=None, validation_steps=None):
 
     if steps_per_epoch is None:
