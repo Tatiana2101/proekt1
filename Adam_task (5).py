@@ -1,53 +1,26 @@
 from tensorflow.keras.applications.resnet import ResNet50
 
-def  load_train(path):
-        datagen = ImageDataGenerator(
+def load_train(path):
+    datagen = ImageDataGenerator(
         horizontal_flip=True,
         vertical_flip=True,
-        rescale=1/255.)
+        rescale=1/255.
+    )
 
-        train_datagen_flow = datagen.flow_from_directory(
+    train_datagen_flow = datagen.flow_from_directory(
         path,
         target_size=(150, 150),
         batch_size=16,
         class_mode='sparse',
-        seed=12345)
-
-        return train_datagen_flow
-
-def create_model(input_shape):
-    backbone = ResNet50(input_shape=(150, 150, 3),
-                    weights='/datasets/keras_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
-                    include_top=False)
-
-    model = Sequential()
-    model.add(backbone)
-    model.add(GlobalAveragePooling2D())
-    model.add(Dense(12, activation='softmax'))
-
-    model.compile(loss='sparse_categorical_crossentropy', 
-              optimizer='adam', metrics=['acc'])
-return modelfrom tensorflow.keras.layers import GlobalAveragePooling2D, Dense
-from tensorflow.keras.models import Sequential
-def  load_train(path):
-        datagen = ImageDataGenerator(
-        horizontal_flip=True,
-        vertical_flip=True,
-        rescale=1/255.)
-
-        train_datagen_flow = datagen.flow_from_directory(
-        path,
-        target_size=(150, 150),
-        batch_size=16,
-        class_mode='sparse',
-        seed=12345)
+        seed=12345
+    )
 
     return train_datagen_flow
 
 def create_model(input_shape):
     backbone = ResNet50(input_shape=(150, 150, 3),
-                    weights='/datasets/keras_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
-                    include_top=False)
+                         weights='/datasets/keras_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
+                         include_top=False)
 
     model = Sequential()
     model.add(backbone)
@@ -55,35 +28,16 @@ def create_model(input_shape):
     model.add(Dense(12, activation='softmax'))
 
     model.compile(loss='sparse_categorical_crossentropy', 
-              optimizer='adam', metrics=['acc'])
-    return model
-def  load_train(path):
-        datagen = ImageDataGenerator(
-        horizontal_flip=True,
-        vertical_flip=True,
-        rescale=1/255.)
+                  optimizer='adam',  # Не забудьте указать оптимизатор
+                  metrics=['accuracy'])
 
-        train_datagen_flow = datagen.flow_from_directory(
-        path,
-        target_size=(150, 150),
-        batch_size=16,
-        class_mode='sparse',
-        seed=12345)
-
-        return train_datagen_flow
-
-def create_model(input_shape):
-    backbone = ResNet50(input_shape=(150, 150, 3),
-                    weights='/datasets/keras_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
-                    include_top=False)
-
-    model = Sequential()
-    model.add(backbone)
-    model.add(GlobalAveragePooling2D())
-    model.add(Dense(12, activation='softmax'))
-
-    model.compile(loss='sparse_categorical_crossentropy', 
-              optimizer='adam', metrics=['acc'])
     return model
 
+def train_model(model, train_data, epochs=10):
+    history = model.fit(
+        train_data,
+        epochs=epochs,
+        steps_per_epoch=train_data.samples // train_data.batch_size
+    )
+    return history
 
