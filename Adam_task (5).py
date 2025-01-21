@@ -39,14 +39,14 @@ def create_model(input_shape):
 
     return model
 
-def train_model(model, train_data, epochs=9):
+def train_model(model, train_data, epochs=7):
     history = model.fit(
         train_data,
         epochs=epochs,
         steps_per_epoch=train_data.samples // train_data.batch_size
     )
     return history
-def train_model(model, train_data, test_data, batch_size=None, epochs=9,
+def train_model(model, train_data, test_data, batch_size=None, epochs=7,
                 steps_per_epoch=None, validation_steps=None):
 
     if steps_per_epoch is None:
