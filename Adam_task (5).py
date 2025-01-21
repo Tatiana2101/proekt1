@@ -1,5 +1,3 @@
-from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
-from tensorflow.keras.models import Sequential
 def  load_train(path):
         datagen = ImageDataGenerator(
         horizontal_flip=True,
