@@ -1,4 +1,7 @@
 from tensorflow.keras.applications.resnet import ResNet50
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
 
 def load_train(path):
     datagen = ImageDataGenerator(
