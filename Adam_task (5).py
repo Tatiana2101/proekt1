@@ -27,7 +27,7 @@ def create_model(input_shape):
 
     model.compile(loss='sparse_categorical_crossentropy', 
               optimizer='adam', metrics=['acc'])
-        return modelfrom tensorflow.keras.layers import GlobalAveragePooling2D, Dense
+return modelfrom tensorflow.keras.layers import GlobalAveragePooling2D, Dense
 from tensorflow.keras.models import Sequential
 def  load_train(path):
         datagen = ImageDataGenerator(
