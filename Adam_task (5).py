@@ -39,7 +39,7 @@ def create_model(input_shape):
 
     return model
 
-def train_model(model, train_data, epochs=10):
+def train_model(model, train_data, epochs=9):
     history = model.fit(
         train_data,
         epochs=epochs,
