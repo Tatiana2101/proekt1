@@ -2,9 +2,7 @@ from tensorflow.keras.applications.resnet import ResNet50
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
-
-from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import GlobalAveragePooling2D
 
 def load_train(path):
     datagen = ImageDataGenerator(
@@ -39,14 +37,14 @@ def create_model(input_shape):
 
     return model
 
-def train_model(model, train_data, epochs=7):
+def train_model(model, train_data, epochs=9):
     history = model.fit(
         train_data,
         epochs=epochs,
         steps_per_epoch=train_data.samples // train_data.batch_size
     )
     return history
-def train_model(model, train_data, test_data, batch_size=None, epochs=7,
+def train_model(model, train_data, test_data, batch_size=None, epochs=9,
                 steps_per_epoch=None, validation_steps=None):
 
     if steps_per_epoch is None:
