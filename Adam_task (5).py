@@ -1,8 +1,7 @@
 from tensorflow.keras.applications.resnet import ResNet50
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
-from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
 
 def load_train(path):
     datagen = ImageDataGenerator(
@@ -14,7 +13,7 @@ def load_train(path):
     train_datagen_flow = datagen.flow_from_directory(
         path,
         target_size=(150, 150),
-        batch_size=16,
+        batch_size=32,  # Увеличен размер батча для ускорения обучения
         class_mode='sparse',
         seed=12345
     )
@@ -23,7 +22,7 @@ def load_train(path):
 
 def create_model(input_shape):
     backbone = ResNet50(input_shape=(150, 150, 3),
-                         weights='/datasets/keras_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
+                         weights='imagenet',  # Используем предобученные веса на ImageNet
                          include_top=False)
 
     model = Sequential()
@@ -32,33 +31,25 @@ def create_model(input_shape):
     model.add(Dense(12, activation='softmax'))
 
     model.compile(loss='sparse_categorical_crossentropy', 
-                  optimizer='adam',  # Не забудьте указать оптимизатор
+                  optimizer='adam',  
                   metrics=['accuracy'])
 
     return model
 
-def train_model(model, train_data, epochs=10):
+def train_model(model, train_data, test_data, epochs=10):
     history = model.fit(
         train_data,
+        validation_data=test_data,
         epochs=epochs,
-        steps_per_epoch=train_data.samples // train_data.batch_size
+        steps_per_epoch=train_data.samples // train_data.batch_size,
+        validation_steps=test_data.samples // test_data.batch_size,
+        verbose=2
     )
     return history
-def train_model(model, train_data, test_data, batch_size=None, epochs=10,
-                steps_per_epoch=None, validation_steps=None):
+from tensorflow.keras.callbacks import EarlyStopping
 
-    if steps_per_epoch is None:
-        steps_per_epoch = len(train_data)
-    if validation_steps is None:
-        validation_steps = len(test_data)
+early_stopping = EarlyStopping(monitor='val_accuracy', patience=5, restore_best_weights=True)
+   
 
-    model.fit(train_data,
-              validation_data=test_data,
-              batch_size=batch_size, epochs=epochs,
-              steps_per_epoch=steps_per_epoch,
-              validation_steps=validation_steps,
-              verbose=2)
-
-    return model
 
 
