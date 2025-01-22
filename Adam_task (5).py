@@ -36,7 +36,7 @@ def create_model(input_shape):
 
     return model
 
-def train_model(model, train_data, test_data, epochs=10):
+def train_model(model, train_data, test_data, epochs=8):
     history = model.fit(
         train_data,
         validation_data=test_data,
