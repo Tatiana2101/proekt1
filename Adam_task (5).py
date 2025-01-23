@@ -1,49 +1,60 @@
-from tensorflow.keras.applications.resnet import ResNet50
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import numpy as np
+import pandas as pd
+from tensorflow.keras.datasets import fashion_mnist
+from tensorflow.keras.layers import Conv2D, Flatten, AvgPool2D, Dense, GlobalAveragePooling2D
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
-from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications.resnet import ResNet50
+
 
 def load_train(path):
-    datagen = ImageDataGenerator(
+    labels = pd.read_csv(path+'labels.csv')
+    train_datagen = ImageDataGenerator(rescale= 1./255, validation_split=0.25)
+    train_datagen_flow = train_datagen.flow_from_dataframe(
+        dataframe = labels,
+        directory = path + 'final_files/',
+        x_col='file_name',
+        y_col='real_age',
+        target_size=(224, 224),
+        batch_size=32,
+        class_mode='raw',
+        subset='training',
         horizontal_flip=True,
-        vertical_flip=True,
-        rescale=1/255.
-    )
-
-    train_datagen_flow = datagen.flow_from_directory(
-        path,
-        target_size=(150, 150),
-        batch_size=16,
-        class_mode='sparse',
-        seed=12345
-    )
-
+        seed=42)
     return train_datagen_flow
 
+def load_test(path):
+    labels = pd.read_csv(path+'labels.csv')
+    test_datagen = ImageDataGenerator(rescale= 1./255, validation_split=0.25)
+    test_datagen_flow = test_datagen.flow_from_dataframe(
+        dataframe = labels,
+        directory = path + 'final_files/',
+        x_col='file_name',
+        y_col='real_age',
+        target_size=(224, 224),
+        batch_size=32,
+        class_mode='raw',
+        subset='validation',
+        seed=42)
+
+    return test_datagen_flow
+
 def create_model(input_shape):
-    backbone = ResNet50(input_shape=(150, 150, 3),
-                         weights='/datasets/keras_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
-                         include_top=False)
+
+    backbone = ResNet50(input_shape= input_shape,
+                    weights='imagenet',
+                    include_top= False)
 
     model = Sequential()
     model.add(backbone)
     model.add(GlobalAveragePooling2D())
-    model.add(Dense(12, activation='softmax'))
-
-    model.compile(loss='sparse_categorical_crossentropy', 
-                  optimizer='adam',  # Не забудьте указать оптимизатор
-                  metrics=['accuracy'])
-
+    model.add(Dense(1, activation='relu'))
+    optimizer = Adam(lr=0.0001)
+    model.compile(optimizer=optimizer, loss='mean_squared_error',metrics=['mae'])
     return model
 
-def train_model(model, train_data, epochs=10):
-    history = model.fit(
-        train_data,
-        epochs=epochs,
-        steps_per_epoch=train_data.samples // train_data.batch_size
-    )
-    return history
+
 def train_model(model, train_data, test_data, batch_size=None, epochs=10,
                 steps_per_epoch=None, validation_steps=None):
 
@@ -51,12 +62,11 @@ def train_model(model, train_data, test_data, batch_size=None, epochs=10,
         steps_per_epoch = len(train_data)
     if validation_steps is None:
         validation_steps = len(test_data)
-
     model.fit(train_data,
-              validation_data=test_data,
+              validation_data= test_data,
               batch_size=batch_size, epochs=epochs,
               steps_per_epoch=steps_per_epoch,
               validation_steps=validation_steps,
               verbose=2)
-
     return model
+
