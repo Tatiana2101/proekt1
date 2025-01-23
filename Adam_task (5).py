@@ -11,7 +11,7 @@ def load_train(path):
         vertical_flip=True,
         rescale=1/255.,
         validation_split=0.2  # Разделение на обучающую и валидационную выборки
-    )
+    )   
 
     train_datagen_flow = datagen.flow_from_directory(
         path,
