@@ -1,69 +1,62 @@
-from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications.resnet import ResNet50
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
-from tensorflow.keras.optimizers import Adam
-import time
+from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
+from tensorflow.keras.layers import GlobalAveragePooling2D
 
 def load_train(path):
     datagen = ImageDataGenerator(
         horizontal_flip=True,
         vertical_flip=True,
-        rescale=1/255.,
-        validation_split=0.2  # Разделение на обучающую и валидационную выборки
+        rescale=1/255.
     )
 
     train_datagen_flow = datagen.flow_from_directory(
         path,
         target_size=(150, 150),
-        batch_size=32,  # Увеличиваем размер батча
+        batch_size=16,
         class_mode='sparse',
-        seed=12345,
-        subset='training'  # Используем подмножество для обучения
+        seed=12345
     )
 
-    validation_datagen_flow = datagen.flow_from_directory(
-        path,
-        target_size=(150, 150),
-        batch_size=32,
-        class_mode='sparse',
-        seed=12345,
-        subset='validation'  # Используем подмножество для валидации
-    )
-
-    return train_datagen_flow, validation_datagen_flow
+    return train_datagen_flow
 
 def create_model(input_shape):
-    backbone = ResNet50(input_shape=input_shape,
-                         weights='imagenet',  # Используем предобученные веса на ImageNet
+    backbone = ResNet50(input_shape=(150, 150, 3),
+                         weights='/datasets/keras_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
                          include_top=False)
 
     model = Sequential()
     model.add(backbone)
     model.add(GlobalAveragePooling2D())
-    model.add(Dense(12, activation='softmax'))  # Предполагается, что у нас 12 классов
-
-    for layer in backbone.layers:
-        layer.trainable = False  # Замораживаем слои бэкбона для начала
+    model.add(Dense(12, activation='softmax'))
 
     model.compile(loss='sparse_categorical_crossentropy', 
-                  optimizer=Adam(learning_rate=0.0001),  # Уменьшаем скорость обучения
+                  optimizer='adam',  # Не забудьте указать оптимизатор
                   metrics=['accuracy'])
 
     return model
 
-def train_model(model, train_data, test_data, epochs=10):
+def train_model(model, train_data, epochs=10):
     history = model.fit(
         train_data,
-        validation_data=test_data,
         epochs=epochs,
-        steps_per_epoch=train_data.samples // train_data.batch_size,
-        validation_steps=test_data.samples // test_data.batch_size,
-        verbose=2
+        steps_per_epoch=train_data.samples // train_data.batch_size
     )
     return history
+def train_model(model, train_data, test_data, batch_size=None, epochs=10,
+                steps_per_epoch=None, validation_steps=None):
 
-    end_time = time.time()  # Засекаем время окончания обучения
-    print(f"Training time: {end_time - start_time} seconds")
-    
-    return history
+    if steps_per_epoch is None:
+        steps_per_epoch = len(train_data)
+    if validation_steps is None:
+        validation_steps = len(test_data)
+
+    model.fit(train_data,
+              validation_data=test_data,
+              batch_size=batch_size, epochs=epochs,
+              steps_per_epoch=steps_per_epoch,
+              validation_steps=validation_steps,
+              verbose=2)
+
+    return model
