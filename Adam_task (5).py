@@ -11,7 +11,7 @@ def load_train(path):
         vertical_flip=True,
         rescale=1/255.,
         validation_split=0.2  # Разделение на обучающую и валидационную выборки
-    )   
+    )
 
     train_datagen_flow = datagen.flow_from_directory(
         path,
@@ -52,7 +52,7 @@ def create_model(input_shape):
 
     return model
 
-def train_model(model, train_data, validation_data, epochs=10):
+def train_model(model, train_data, test_data, validation_data, epochs=10):
     start_time = time.time()  # Засекаем время начала обучения
     history = model.fit(
         train_data,
