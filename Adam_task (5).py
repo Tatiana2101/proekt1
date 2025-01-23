@@ -52,16 +52,17 @@ def create_model(input_shape):
 
     return model
 
-def train_model(model, train_data, test_data, validation_data, epochs=10):
-    start_time = time.time()  # Засекаем время начала обучения
+def train_model(model, train_data, test_data, epochs=10):
     history = model.fit(
         train_data,
-        validation_data=validation_data,
+        validation_data=test_data,
         epochs=epochs,
         steps_per_epoch=train_data.samples // train_data.batch_size,
-        validation_steps=validation_data.samples // validation_data.batch_size,
+        validation_steps=test_data.samples // test_data.batch_size,
         verbose=2
     )
+    return history
+
     end_time = time.time()  # Засекаем время окончания обучения
     print(f"Training time: {end_time - start_time} seconds")
     
